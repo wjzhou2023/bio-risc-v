@@ -6,6 +6,7 @@ A repository for optimized bioinformatics programs performing on SG2042.
 | :---- | :----: | :----: | :----: | :----: | :----: |
 | BWA | &#10004; | &#10004; | &#10004; | | |
 | Bowtie2 | &#10004; | | &#10004; | &#10004; | &#10004; |
+| Minimap2 | &#10004; |&#10004; | &#10004; |  | &#10004; |
 
 ## Optimization results
 Genome reference data: 
@@ -40,7 +41,16 @@ Optimization results of BWA on seq3 (seconds):
 Optimization results of Bowtie2 on seq2(seconds):
 |#Thread|Ori|GCC|SSE2Scalar|NUMACTL|
 | :----: |:----:|:----:|:----:|:----:|
-|1|79502|79052|78075|-|
-|16|5076|5022|4622|4374|
-|32|2612|2646|2481|2216|
-|64|1947|1812|1783|1143|
+|1|79,502|79,052|78,075|-|
+|16|5,076|5,022|4,622|4,374|
+|32|2,612|2,646|2,481|2,216|
+|64|1,947|1,812|1,783|1,143|
+
+Optimization results of Minimap2 on seq3(seconds):
+|#Thread|Ori|GCC|NUMACTL|Huge Page|Thread Affinity|
+| :----: |:----:|:----:|:----:|:----:|:----:|
+|1|40,194|31,877|30,897|30,403|30,221|
+|16|2,822|2,249|2,057|2,050|2,041|
+|32|1,456|1,249|1,073|1,068|1,056|
+|64|4,559|3,922|828|577|567|
+
