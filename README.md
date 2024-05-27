@@ -2,9 +2,10 @@
 A repository for optimized bioinformatics programs performing on SG2042. 
 
 ## Optimization methods
-| Programs | GCC | Huge Page | NUMACTL | SEE2Scalar | Thread Affinity |
+| Programs | GCC | Huge Page | NUMACTL | SSE2Scalar | Thread Affinity |
 | :---- | :----: | :----: | :----: | :----: | :----: |
 | BWA | &#10004; | &#10004; | &#10004; | | |
+| Bowtie2 | &#10004; | | &#10004; | &#10004; | &#10004; |
 
 ## Optimization results
 Genome reference data: 
@@ -34,3 +35,12 @@ Optimization results of BWA on seq3 (seconds):
 | 16| 4,061 | 3,001 | 2,394 | 2,353 |
 | 32 | 2,282 | 1,747 | 1,242 | 1,194 |
 | 64 | 9,826 | 9,270 | 3,722 | 631 |
+
+
+Optimization results of Bowtie2 on seq2(seconds):
+|#Thread|Ori|GCC|SSE2Scalar|NUMACTL|
+| :----: |:----:|:----:|:----:|:----:|
+|1|79502|79052|78075|-|
+|16|5076|5022|4622|4374|
+|32|2612|2646|2481|2216|
+|64|1947|1812|1783|1143|
