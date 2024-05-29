@@ -1,11 +1,11 @@
 # bio-risc-v
-A repository for optimized bioinformatics programs performing on SG2042. 
+A repository for optimized bioinformatics programs, virtual environment installation scripts and docker images performing on SG2042. 
 
 ## Optimization methods
 | Programs | GCC | Huge Page | NUMACTL | SSE2Scalar | Thread Affinity |
 | :---- | :----: | :----: | :----: | :----: | :----: |
 | BWA | &#10004; | &#10004; | &#10004; | | |
-| Bowtie2 | &#10004; | | &#10004; | &#10004; | &#10004; |
+| Bowtie2 | &#10004; | | &#10004; | &#10004; | |
 | Minimap2 | &#10004; |&#10004; | &#10004; |  | &#10004; |
 
 ## Optimization results
@@ -54,3 +54,16 @@ Optimization results of Minimap2 on seq3(seconds):
 |32|1,456|1,249|1,073|1,068|1,056|
 |64|4,559|3,922|828|577|567|
 
+## docker images
+
+The docker images containing different bioinformatics programs has been uploaded to the docker hub. Podman is suggested to be used to pull these images.
+
+| Image Name | Usage | Contributor |
+| :-------- | :--- | :---------: |
+| rv_htseq_env | podman pull docker.io/wenjingzhou/rv_htseq_env | Wenjing Zhou |
+| rv_treebest_env | podman pull docker.io/wenjingzhou/rv_treebest_env | Wenjing Zhou |
+| rv_bwa_env | podman pull docker.io/wenjingzhou/rv_bwa_env | Wenjing Zhou |
+| rv_yak_env | podman pull docker.io/wenjingzhou/rv_yak_env | Wenjing Zhou |
+| rv_ucsc_genome_browser_env | podman pull docker.io/wenjingzhou/rv_ucsc_genome_browser_env | Wenjing Zhou |
+| rv_bowtie2 | podman pull docker.io/n9wx/rv_bowtie2 | Nanxin Wei |
+| rv_methylpy | podman pull docker.io/n9wx/rv_methylpy | Nanxin Wei |

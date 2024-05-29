@@ -1,0 +1,245 @@
+diff --git a/scripts/vcffirstheader b/scripts/vcffirstheader
+index d37bb87..4074b6b 100755
+--- a/scripts/vcffirstheader
++++ b/scripts/vcffirstheader
+@@ -6,11 +6,11 @@ header=True
+ for line in sys.stdin:
+     if line.startswith('##'):
+         if header:
+-            print line.strip()
++            print(line.strip())
+         continue
+     elif line.startswith('#'):
+         if header:
+-           print line.strip()
++           print(line.strip())
+            header=False
+         continue
+-    print line.strip()
++    print(line.strip())
+diff --git a/src/cdflib.cpp b/src/cdflib.cpp
+index 236ab70..c294f39 100644
+--- a/src/cdflib.cpp
++++ b/src/cdflib.cpp
+@@ -10040,7 +10040,7 @@ void negative_binomial_cdf_values ( int *n_data, int *f, int *s, double *p,
+     1, 2, 3,
+     0, 1, 2 };
+ 
+-  if ( n_data < 0 )
++  if ( *n_data < 0 )
+   {
+     *n_data = 0;
+   }
+diff --git a/src/scalar_sse.h b/src/scalar_sse.h
+new file mode 100644
+index 0000000..ac7c39c
+--- /dev/null
++++ b/src/scalar_sse.h
+@@ -0,0 +1,156 @@
++#ifndef SCALAR_SSE_H
++#define SCALAR_SSE_H
++
++#include <assert.h>
++#include <stdint.h>
++#include <string.h>
++
++typedef union m128i {
++	uint8_t u8[16];
++	int16_t i16[8];
++  int8_t  i8[16];
++  uint16_t u16[8];
++} __m128i;
++
++static inline __m128i _mm_set1_epi32(int32_t n) {
++	assert(n >= 0 && n <= 255);
++	__m128i r; memset(&r, n, sizeof r); return r;
++}
++
++static inline __m128i _mm_load_si128(const __m128i *ptr) { __m128i r; memcpy(&r, ptr, sizeof r); return r; }
++static inline void _mm_store_si128(__m128i *ptr, __m128i a) { memcpy(ptr, &a, sizeof a); }
++
++static inline int m128i_allzero(__m128i a) {
++	static const char zero[] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
++	return memcmp(&a, zero, sizeof a) == 0;
++}
++
++static inline __m128i _mm_slli_si128(__m128i a, int n) {
++	int i;
++	memmove(&a.u8[n], &a.u8[0], 16 - n);
++	for (i = 0; i < n; i++) a.u8[i] = 0;
++	return a;
++}
++
++static inline __m128i _mm_adds_epu8(__m128i a, __m128i b) {
++	int i;
++	for (i = 0; i < 16; i++) {
++		uint16_t aa = a.u8[i];
++		aa += b.u8[i];
++		a.u8[i] = (aa < 256)? aa : 255;
++	}
++	return a;
++}
++
++static inline __m128i _mm_max_epu8(__m128i a, __m128i b) {
++	int i;
++	for (i = 0; i < 16; i++)
++		if (a.u8[i] < b.u8[i]) a.u8[i] = b.u8[i];
++	return a;
++}
++
++static inline uint8_t m128i_max_u8(__m128i a) {
++	uint8_t max = 0;
++	int i;
++	for (i = 0; i < 16; i++)
++		if (max < a.u8[i]) max = a.u8[i];
++	return max;
++}
++
++static inline __m128i _mm_set1_epi8(int8_t n) { __m128i r; memset(&r, n, sizeof r); return r; }
++
++static inline __m128i _mm_subs_epu8(__m128i a, __m128i b) {
++	int i;
++	for (i = 0; i < 16; i++) {
++		int16_t aa = a.u8[i];
++		aa -= b.u8[i];
++		a.u8[i] = (aa >= 0)? aa : 0;
++	}
++	return a;
++}
++
++static inline __m128i _mm_adds_epi16(__m128i a, __m128i b) {
++	int i;
++	for (i = 0; i < 8; i++) {
++		int32_t aa = a.i16[i];
++		aa += b.i16[i];
++		a.i16[i] = (aa < 32768)? aa : 32767;
++	}
++	return a;
++}
++
++static inline __m128i _mm_cmpgt_epi16(__m128i a, __m128i b) {
++	int i;
++	for (i = 0; i < 8; i++)
++		a.i16[i] = (a.i16[i] > b.i16[i])? 0xffff : 0x0000;
++	return a;
++}
++
++static inline __m128i _mm_cmpeq_epi8(__m128i a,__m128i b) {
++  for (int i = 0; i< 16 ;++i) {
++    a.i8[i] = (a.i8[i] == b.i8[i]) ? 0xffff : 0x0000;
++  }
++  return a;
++}
++
++static inline __m128i _mm_max_epi16(__m128i a, __m128i b) {
++	int i;
++	for (i = 0; i < 8; i++)
++		if (a.i16[i] < b.i16[i]) a.i16[i] = b.i16[i];
++	return a;
++}
++
++static inline int _mm_movemask_epi8(__m128i a) {
++    int ret = 0;
++    for(int i = 15 ;i >= 0;--i) {
++        ret |= ((a.u8[15 - i] >> 7) << (15 - i));
++    }
++    return ret;
++}
++
++static inline int _mm_extract_epi16(__m128i a,const int imm8) {
++    return a.u16[imm8 & 0x7];
++}
++
++static inline __m128i _mm_cmpeq_epi16(__m128i a,__m128i b) {
++    for (int i = 0;i < 8 ;++i) {
++        a.i16[i] = (a.i16[i] == b.i16[i]) ? 0xffffffff : 0;
++    }
++    return a;
++}
++
++
++static inline __m128i _mm_srli_si128(__m128i a, int n) {
++       int i;
++       memmove(&a.u8[0], &a.u8[n], 16 - n);
++       for (i = 16 - n; i < n; i++) a.u8[i] = 0;
++       return a;
++}
++
++
++static inline __m128i _mm_set1_epi16(int16_t n) {
++	__m128i r;
++	r.i16[0] = r.i16[1] = r.i16[2] = r.i16[3] =
++	r.i16[4] = r.i16[5] = r.i16[6] = r.i16[7] = n;
++	return r;
++}
++
++static inline int16_t m128i_max_s16(__m128i a) {
++	int16_t max = -32768;
++	int i;
++	for (i = 0; i < 8; i++)
++		if (max < a.i16[i]) max = a.i16[i];
++	return max;
++}
++
++static inline __m128i _mm_subs_epu16(__m128i a, __m128i b) {
++	int i;
++	for (i = 0; i < 8; i++) {
++		int32_t aa = a.i16[i];
++		aa -= b.i16[i];
++		a.i16[i] = (aa >= 0)? aa : 0;
++	}
++	return a;
++}
++
++#endif
+diff --git a/src/ssw.c b/src/ssw.c
+index 69646f1..bdb28fe 100644
+--- a/src/ssw.c
++++ b/src/ssw.c
+@@ -8,7 +8,11 @@
+  *
+  */
+ 
++#if defined(__SSE2__)
+ #include <emmintrin.h>
++#else 
++#include "scalar_sse.h"
++#endif
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+diff --git a/src/ssw.h b/src/ssw.h
+index 3cb45c8..1526cf0 100644
+--- a/src/ssw.h
++++ b/src/ssw.h
+@@ -14,7 +14,11 @@
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <string.h>
++#if defined(__SSE2__)
+ #include <emmintrin.h>
++#else 
++#include "scalar_sse.h"
++#endif
+ 
+ /*!	@typedef	structure of the query profile	*/
+ struct _profile;
+diff --git a/src/vcfkeepinfo.cpp b/src/vcfkeepinfo.cpp
+index 0b33fa2..a0da793 100644
+--- a/src/vcfkeepinfo.cpp
++++ b/src/vcfkeepinfo.cpp
+@@ -51,12 +51,12 @@ int main(int argc, char** argv) {
+     while (variantFile.getNextVariant(var)) {
+         for (map<string, vector<string> >::iterator i = var.info.begin(); i != var.info.end(); ++i) {
+             if (!fieldsToKeep.count(i->first)) {
+-                var.info.erase(i->first);
++               i =  var.info.erase(i);
+             }
+         }
+         for (map<string, bool>::iterator i = var.infoFlags.begin(); i != var.infoFlags.end(); ++i) {
+             if (!fieldsToKeep.count(i->first)) {
+-                var.infoFlags.erase(i->first);
++               i =  var.infoFlags.erase(i);
+             }
+         }
+         cout << var << endl;
