@@ -65,5 +65,6 @@ The docker images containing different bioinformatics programs has been uploaded
 | rv_bwa_env | podman pull docker.io/wenjingzhou/rv_bwa_env | Wenjing Zhou |
 | rv_yak_env | podman pull docker.io/wenjingzhou/rv_yak_env | Wenjing Zhou |
 | rv_ucsc_genome_browser_env | podman pull docker.io/wenjingzhou/rv_ucsc_genome_browser_env | Wenjing Zhou |
+| rv_minimap2_env | podman pull docker.io/wenjingzhou/rv_minimap2_env | Chen Han, Wenjing Zhou |
 | rv_bowtie2 | podman pull docker.io/n9wx/rv_bowtie2 | Nanxin Wei |
 | rv_methylpy | podman pull docker.io/n9wx/rv_methylpy | Nanxin Wei |
